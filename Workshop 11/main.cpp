@@ -1,0 +1,254 @@
+#include <iostream>
+using namespace std;
+
+class Matrix
+{
+public:
+	Matrix(){}
+	Matrix(int sizeR, int sizeC, double val);
+	Matrix(const Matrix&);
+	Matrix(int sizeR, int sizeC, double *input_data);
+	~Matrix();
+	Matrix Matrix::getBlock(int start_row, int end_row, int start_column , int end_column );
+	Matrix Matrix::operator+(const Matrix& existing);
+	Matrix Matrix::operator-(const Matrix& existing);
+	Matrix Matrix::operator=(const Matrix& existing);
+	Matrix Matrix::operator*(const Matrix& existing); 
+	Matrix Matrix::operator/(const Matrix& existing);
+	Matrix Matrix::operator++(); 
+	Matrix Matrix::operator--();
+	double Matrix::operator()(int i, int j);
+	double get(int i, int j) const{ return data[i*N + j]; };
+	void set(int i, int j, double val) { data[i*N + j] = val; };
+
+protected:
+	int M;
+	int N;
+	double* data;
+};
+
+
+class BinaryImage: public Matrix
+{
+	BinaryImage(int M, int N, double* input_data, double threshold);
+
+};
+
+BinaryImage::BinaryImage(int M, int N, double* input_data, double threshold)
+
+{
+	for (int i = 0; i<N; i++)
+	for (int j = 0; j<M; j++)
+
+	if (data[i*N+j]>threshold)
+	{
+		data[i*N+j]=1;
+	}
+	else
+	{
+		data[i*N+j]=0;
+	} 
+
+	cout<<"BinaryImage::BinaryImage(int M, int N, double* input_data, double threshold) is invoked.... " << endl; 
+}
+
+int main()
+{
+	int k, m, n, l;
+	int a = 5;
+	int b = 7;
+	double* thing = new double[a*b];
+	for (int i = 0; i < a*b; i++)
+	{
+		thing[i] = i + 1;
+	}
+	Matrix matrix1(5, 7, thing);
+	cout << "Input the starting column  of the matrix: ";
+	cin >> k;
+	cout << "Input the starting row of the matrix: ";
+	cin >> n;
+	cout << "Input the ending column  of the matrix:  ";
+	cin >> l;
+	cout << "Input the ending row of the matrix: ";
+	cin >> m;
+	matrix1.getBlock(k, n, l, m);
+
+	Matrix matrix2(matrix1); 
+	Matrix matrix3 = matrix2.getBlock(2, 3, 4, 4); 
+	matrix3++;
+	Matrix matrix4 = matrix3++; 
+
+	system("pause");
+	return 0;
+}
+Matrix::Matrix(int sizeR, int sizeC, double val)
+{
+	M = sizeR;
+	N = sizeC;
+
+	data = new double[M*N];
+
+	for (int ii = 0; ii<M*N; ii++)
+	{
+		data[ii] = val;
+	}
+	cout << "Matrix::Matrix(int sizeR, int sizeC, double val) is invoked." << endl;
+}
+
+Matrix::Matrix(int sizeR, int sizeC, double* input_data)
+{
+	M = sizeR;
+	N = sizeC;
+
+	data = new double[M*N];
+
+	for (int ii = 0; ii<M*N; ii++)
+	{
+		data[ii] = input_data[ii];
+	}
+	cout << "Matrix::Matrix(int sizeR, int sizeC, double* input_data) is invoked." << endl;
+}
+Matrix::Matrix(const Matrix& m)
+{
+	M = m.M;
+	N = m.N;
+
+	data = new double[M*N];
+
+	for (int ii = 0; ii < M*N; ii++)
+	{
+		data[ii] = m.data[ii];
+	}
+	cout << "Matrix::Matrix(const Matrix&) is invoked." << endl;
+}
+
+Matrix Matrix::getBlock(int start_row, int start_column , int end_column , int end_row)
+{
+	int endBlock = end_column  - start_column  +1;
+	int startBlock = end_row - start_row +1;
+
+	double *block = new double[startBlock*endBlock];
+	for (int i = 0; i<startBlock; i++)
+	for (int j = 0; j<endBlock; j++)
+	{
+		*(block + (i*startBlock + j)) = this->get(i + start_row, j + start_column );
+		cout << *(block + (i* startBlock + j)) << " "; 
+	}
+
+	return Matrix(startBlock, endBlock, data);
+}
+
+Matrix Matrix::operator+(const Matrix& existing)
+{
+	Matrix temp;
+
+	temp.M = existing.M;
+	temp.N = existing.M;
+
+	temp.data = new double[temp.M*temp.N];
+	for (int k = 0; k < (temp.M*temp.N); k++)
+	{
+		temp.data[k] = this->data[k] + existing.data[k];
+	}
+	return temp;
+	
+	cout << " Matrix::operator+ is invoked." << endl; 
+}
+
+Matrix Matrix::operator-(const Matrix& existing)
+{
+	Matrix temp;
+	temp.M = existing.M;
+	temp.N = existing.M;
+
+	temp.data = new double[temp.M*temp.N];
+	for (int k = 0; k < (temp.M*temp.N); k++)
+	{
+		temp.data[k] = this->data[k] - existing.data[k];
+	}
+	return temp;
+	cout << " Matrix::operator- is invoked." << endl;
+}
+
+Matrix Matrix::operator*(const Matrix& existing)
+{
+	Matrix temp;
+	temp.M = existing.M;
+	temp.N = existing.M;
+
+	temp.data = new double[temp.M*temp.N];
+	for (int k = 0; k < (temp.M*temp.N); k++)
+	{
+		temp.data[k] = this->data[k] * existing.data[k];
+	}
+	return temp;
+	cout << " Matrix::operator* is invoked." << endl;
+}
+
+Matrix Matrix::operator/(const Matrix& existing)
+{
+	Matrix temp;
+	temp.M = existing.M;
+	temp.N = existing.M;
+
+	temp.data = new double[temp.M*temp.N];
+	for (int k = 0; k < (temp.M*temp.N); k++)
+	{
+		temp.data[k] = this->data[k] / existing.data[k];
+	}
+	return temp;
+	cout << " Matrix::operator/ is invoked." << endl;
+}
+
+Matrix Matrix::operator++()
+{ 
+	for (int i = 0; i < (M); i++)
+		for (int j = 0; j < (N); i++)
+			this->set(i, j, get(i, j) + 1);
+
+	cout << " Matrix::operator++ is invoked." << endl;
+
+	return *this;
+}
+
+Matrix Matrix::operator--()
+{
+	for (int i = 0; i < (M); i--)
+		for (int j = 0; j < (N); i--)
+			this->set(i, j, get(i, j) - 1);
+
+	cout << " Matrix::operator-- is invoked." << endl;
+
+	return *this; 
+}
+
+
+Matrix Matrix::operator=(const Matrix& existing)
+{
+	delete[] data;
+	
+	Matrix temp;
+	temp.M = existing.M;
+	temp.N = existing.M;
+
+	temp.data = new double[temp.M*temp.N];
+	for (int k = 0; k < (temp.M*temp.N); k++)
+	{
+		data[k] = existing.data[k];
+	}
+	return temp;
+
+	cout << " Matrix::operator= is invoked." << endl;
+}
+
+double Matrix::operator()(int i, int j)
+{
+	return get(i, j);
+}
+
+Matrix::~Matrix()
+{
+	delete[] data;
+	data = 0;
+	cout << "Matrix::~Matrix() is invoked." << endl;
+}
